@@ -37,7 +37,8 @@ median(totalStepsPerDay, na.rm=T)
 
 ## What is the average daily activity pattern?
 
-Plot of mean number of steps per time interval and per day
+Plot of mean number of steps per time interval over days and per day over time
+intervals
 ```{r, fig.width=10, fig.height=4}
 # calculate mean steps over time intervals (row) and days (columns)
 intervals <- as.numeric(row.names(fitData))
@@ -45,10 +46,10 @@ meanStepsPerInterval <- apply(fitData, 1, mean, na.rm=T)
 meanStepsPerDay <- apply(fitData, 2, mean, na.rm=T)
 
 par(mfrow=c(1,2))
-plot(intervals, meanStepsPerInterval, type="l",
-     main="Mean Steps per Interval", xlab="Time Interval", ylab="Mean Steps")
-plot(meanStepsPerDay, type="l",
-     main="Mean Steps per Day", xlab="Day", ylab="Mean Steps")
+plot(intervals, meanStepsPerInterval, type="l", xlab="Time Interval",
+     main="Mean Steps per Interval (over days)", ylab="Mean Steps")
+plot(meanStepsPerDay, type="l", xlab="Day", ylab="Mean Steps",
+     main="Mean Steps per Day (over intervals)")
 ```
 
 Interval with largest mean number of steps

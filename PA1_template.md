@@ -57,7 +57,8 @@ median(totalStepsPerDay, na.rm=T)
 
 ## What is the average daily activity pattern?
 
-Plot of mean number of steps per time interval and per day
+Plot of mean number of steps per time interval over days and per day over time
+intervals
 
 ```r
 # calculate mean steps over time intervals (row) and days (columns)
@@ -66,10 +67,10 @@ meanStepsPerInterval <- apply(fitData, 1, mean, na.rm=T)
 meanStepsPerDay <- apply(fitData, 2, mean, na.rm=T)
 
 par(mfrow=c(1,2))
-plot(intervals, meanStepsPerInterval, type="l",
-     main="Mean Steps per Interval", xlab="Time Interval", ylab="Mean Steps")
-plot(meanStepsPerDay, type="l",
-     main="Mean Steps per Day", xlab="Day", ylab="Mean Steps")
+plot(intervals, meanStepsPerInterval, type="l", xlab="Time Interval",
+     main="Mean Steps per Interval (over days)", ylab="Mean Steps")
+plot(meanStepsPerDay, type="l", xlab="Day", ylab="Mean Steps",
+     main="Mean Steps per Day (over intervals)")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
@@ -132,7 +133,7 @@ sprintf("Mean steps per day. Raw:%0.2f, Imputed:%0.2f",
 ```
 
 ```
-## [1] "Mean steps per day. Raw:10766.19, Imputed:10842.33"
+## [1] "Mean steps per day. Raw:10766.19, Imputed:10786.59"
 ```
 
 ```r
@@ -141,7 +142,7 @@ sprintf("Median steps per day. Raw:%0.2f, Imputed:%0.2f",
 ```
 
 ```
-## [1] "Median steps per day. Raw:10765.00, Imputed:11015.00"
+## [1] "Median steps per day. Raw:10765.00, Imputed:10600.00"
 ```
 Total number of steps per day increase with imputation, but means and medians
 don't change much (both numerator and denominator increase)
