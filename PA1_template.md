@@ -132,7 +132,7 @@ sprintf("Mean steps per day. Raw:%0.2f, Imputed:%0.2f",
 ```
 
 ```
-## [1] "Mean steps per day. Raw:10766.19, Imputed:10721.82"
+## [1] "Mean steps per day. Raw:10766.19, Imputed:10842.33"
 ```
 
 ```r
@@ -141,13 +141,14 @@ sprintf("Median steps per day. Raw:%0.2f, Imputed:%0.2f",
 ```
 
 ```
-## [1] "Median steps per day. Raw:10765.00, Imputed:10600.00"
+## [1] "Median steps per day. Raw:10765.00, Imputed:11015.00"
 ```
-
+Total number of steps per day increase with imputation, but means and medians
+don't change much (both numerator and denominator increase)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-Compare per interval activity on weekdays vs. weekends
+Plot per interval activity on weekdays vs. weekends
 
 ```r
 # create factor variable indicating weekday/weekend status of each day
@@ -156,11 +157,16 @@ weekendFlag <- as.factor(ifelse(day %in% c("Saturday","Sunday"),
                                 "weekend", "weekday"))
 
 # plot per time interval mean number of steps over weekdays and weekends
-par(mfrow=c(1,2))
+par(mfrow=c(2,1), mar=c(0,4.1,4.1,2.1))
 plot(intervals, apply(imputedFitData[,weekendFlag=="weekday"], 1, mean, na.rm=T),
-     main="Mean Steps per Interval (Weekdays)", ylab="Mean Steps", type="l")
+     main="Mean Steps per Interval", ylab="Mean Steps", xaxt="n", type="l")
+legend("topright", "Weekdays")
+
+par(mar=c(5.1,4.1,0,2.1))
 plot(intervals, apply(imputedFitData[,weekendFlag=="weekend"], 1, mean, na.rm=T),
-     main="Mean Steps per Interval (Weekends)", ylab="Mean Steps", type="l")
+     ylab="Mean Steps", type="l")
+legend("topright", "Weekends")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+<BR>Looks like there is more uniform activity on weekends
