@@ -8,18 +8,102 @@ output:
 
 ## Loading and preprocessing the data
 
+Read data from fitness tracker, reshape to a wide table and print the first few
+rows/columns of the reshaped table
+```{r}
+# Read data file and reshape to wide table
+fitData <- read.csv("activity.csv", stringsAsFactors=F)
+fitData <- reshape(fitData, timevar="date", idvar="interval", direction="wide")
+fitData <- data.frame(fitData[,-1], row.names=fitData[,1])
+colnames(fitData) <- gsub("steps.", "", colnames(fitData))
 
+fitData[1:5, 1:6]
+```
 
 ## What is mean total number of steps taken per day?
 
+Histogram of total steps per day
+```{r, fig.width=5, fig.height=4}
+totalStepsPerDay <- apply(fitData, 2, sum)
+hist(totalStepsPerDay, breaks=15, main="Total Steps Per Day", xlab="Num Steps")
+```
+
+Mean and median total steps per day
+```{r}
+mean(totalStepsPerDay, na.rm=T)
+median(totalStepsPerDay, na.rm=T)
+```
 
 
 ## What is the average daily activity pattern?
 
+Plot of mean number of steps per time interval and per day
+```{r, fig.width=10, fig.height=4}
+# calculate mean steps over time intervals (row) and days (columns)
+intervals <- as.numeric(row.names(fitData))
+meanStepsPerInterval <- apply(fitData, 1, mean, na.rm=T)
+meanStepsPerDay <- apply(fitData, 2, mean, na.rm=T)
 
+par(mfrow=c(1,2))
+plot(intervals, meanStepsPerInterval, type="l",
+     main="Mean Steps per Interval", xlab="Time Interval", ylab="Mean Steps")
+plot(meanStepsPerDay, type="l",
+     main="Mean Steps per Day", xlab="Day", ylab="Mean Steps")
+```
+
+Interval with largest mean number of steps
+```{r}
+idx <- which(meanStepsPerInterval==max(meanStepsPerInterval))
+paste("Most active interval:", intervals[idx])
+```
 
 ## Imputing missing values
 
+Impute missing values by random selection of step values.  Since there is more
+variation over intervals, perform the sampling for imputation on a per
+interval basis.
+```{r}
+# copy data frame and impute missing values data over intervals (rows) by random
+# sampling of non-missing values in each interval
+imputedFitData <- fitData
+for(i in 1:nrow(imputedFitData)) {
+    idx1 <- which(is.na(imputedFitData[i,]))
+    idx2 <- which(!is.na(imputedFitData[i,]))
+    imputedFitData[i,idx1] <- sample(imputedFitData[i,idx2], size=length(idx1))
+}
+imputedFitData[1:5, 1:6]
+```
+
+Compare histograms, means, and medians of total steps taken per day on raw vs.
+imputed data
+```{r, fig.width=10, fig.height=4}
+imputedStepsPerDay <- apply(imputedFitData, 2, sum)
+par(mfrow=c(1,2))
+hist(totalStepsPerDay, breaks=15, main="Total Steps Per Day (Raw Data)",
+     xlab="Num Steps")
+hist(imputedStepsPerDay, breaks=15, main="Total Steps Per Day (Imputed Data)",
+     xlab="Num Steps")
+
+sprintf("Mean steps per day. Raw:%0.2f, Imputed:%0.2f",
+        mean(totalStepsPerDay, na.rm=T), mean(imputedStepsPerDay))
+sprintf("Median steps per day. Raw:%0.2f, Imputed:%0.2f",
+        median(totalStepsPerDay, na.rm=T), median(imputedStepsPerDay))
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+Compare per interval activity on weekdays vs. weekends
+```{r, fig.width=10, fig.height=4}
+# create factor variable indicating weekday/weekend status of each day
+day <- weekdays(as.Date(colnames(imputedFitData), format="%Y.%m.%d"))
+weekendFlag <- as.factor(ifelse(day %in% c("Saturday","Sunday"),
+                                "weekend", "weekday"))
+
+# plot per time interval mean number of steps over weekdays and weekends
+par(mfrow=c(1,2))
+plot(intervals, apply(imputedFitData[,weekendFlag=="weekday"], 1, mean, na.rm=T),
+     main="Mean Steps per Interval (Weekdays)", ylab="Mean Steps", type="l")
+plot(intervals, apply(imputedFitData[,weekendFlag=="weekend"], 1, mean, na.rm=T),
+     main="Mean Steps per Interval (Weekends)", ylab="Mean Steps", type="l")
+```
